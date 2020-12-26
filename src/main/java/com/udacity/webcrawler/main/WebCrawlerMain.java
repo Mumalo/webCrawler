@@ -57,16 +57,18 @@ public final class WebCrawlerMain {
     }
 
     if (resultPath.isEmpty() || profileDataPath.isEmpty()){
-      Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
-      if (resultPath.isEmpty()){
-        resultWriter.write(outputWriter);
-      }
-
       if (profileDataPath.isEmpty()){
-        outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+        System.out.println("Writing profiled data to console");
+        Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
         System.out.println("Writing performance into console\n");
         profiler.writeData(outputWriter);
         outputWriter.flush();
+      }
+
+      if (resultPath.isEmpty()){
+        System.out.println("Writing profiler result to console");
+        Writer outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+        resultWriter.write(outputWriter);
       }
     }
   }
