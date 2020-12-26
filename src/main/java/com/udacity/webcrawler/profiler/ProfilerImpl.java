@@ -73,7 +73,6 @@ final class ProfilerImpl implements Profiler {
 
   @Override
   public void writeData(Path path) throws IOException {
-    System.out.println("Writing profiling state data.....");
     Objects.requireNonNull(path);
     if (Files.notExists(path)){
       Files.createFile(path);

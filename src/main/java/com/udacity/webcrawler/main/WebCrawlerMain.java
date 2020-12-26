@@ -37,11 +37,11 @@ public final class WebCrawlerMain {
   private void run() throws Exception {
     Guice.createInjector(new WebCrawlerModule(config), new ProfilerModule()).injectMembers(this);
 
-    CrawlResult result = crawler.crawl(config.getStartPages());
+    WebCrawler crawlerProxy = profiler.wrap(WebCrawler.class, crawler);
+    CrawlResult result = crawlerProxy.crawl(config.getStartPages());
     CrawlResultWriter resultWriter = new CrawlResultWriter(result);
     String resultPath = config.getResultPath();
     String profileDataPath = config.getProfileOutputPath();
-
 
     if (!resultPath.isEmpty() || !profileDataPath.isEmpty()){
       if (!resultPath.isEmpty()){
@@ -64,8 +64,9 @@ public final class WebCrawlerMain {
 
       if (profileDataPath.isEmpty()){
         outputWriter = new BufferedWriter(new OutputStreamWriter(System.out));
-        System.out.printf("Writing performance info in file: %s%n", profileDataPath);
+        System.out.println("Writing performance into console\n");
         profiler.writeData(outputWriter);
+        outputWriter.flush();
       }
     }
   }
