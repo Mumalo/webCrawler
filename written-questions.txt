@@ -1,0 +1,65 @@
+Written Questions
+
+Q1. Run the web crawler using the configurations located at src/main/config/written_question_1a.json and
+    src/main/config/written_question_1b.json. The only difference between these configurations is that one always uses
+    the sequential crawler and the other always uses the parallel crawler. Inspect the profile output in
+    profileData.txt.
+
+    If you are using a multi-processor computer, you should notice that SequentialWebCrawler#crawl and
+    ParallelWebCrawler#crawl took about the same amount of time, but PageParserImpl#parse took much longer when run with
+    the ParallelWebCrawler.
+
+    Why did the parser take more time when run with ParallelWebCrawler?
+
+
+
+
+Q2. Your manager ran your crawler on her old personal computer, using the configurations from Q1, and she notices that
+    the sequential crawler actually outperforms the parallel crawler. She would like to know why.
+
+    (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
+        (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
+
+    (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
+        crawler. Why will it perform better?
+
+
+Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:
+
+    (a) What cross-cutting concern is being addressed by the com.udacity.webcrawler.profiler.Profiler class?
+
+    We are logging the duration taking by certain methods to run. This is a cross-cutting concern because the same functionality
+    if needed in many parts of the program, i.e. all methods that have the Profiled annotation. We achieved this by creating a dynamic
+    proxy and thus routing all the method calls on the delegated objects through the proxy that then performs the additional effect, in
+    this case logging the duration taken by methods to run.
+
+    (b) What are the join points of the Profiler in the web crawler program?
+    Joint points are the methods that are annotated with the @Profiled annotation
+
+
+Q4. Identify three (3) different design patterns used in this project, and explain which interfaces, classes, and/or
+    libraries use or implement those design patterns.
+    1. Dependency Injection: We used google's Guice library to inject dependencies in most parts of our application
+       an example of a class that used dependency injection is the WebCrawlerMain that injects Webcrawler and Profiler classes.
+       Since we do not have to manually construct dependencies, our code becomes fairly simpler and easy to manage. Again, the
+       complexities of manually constructing every dependency down the tree is lifted.
+
+
+    2. Builder Pattern: In cases where we are faced with many constructor parameters, we used the builder pattern to
+       provide more readable and cleaner APIs. For instance, CrawlerConfiguration uses the builder patten to load properties from
+       the given configuration file into the object using jackson.
+       Although this pattern shines when constructing complex objects, it will be useless to use it to construct fairly simple
+       objects like objects with few attributes.
+
+    3. Singleton Pattern: When injecting some of our dependencies with Guice, we specified that we need only single instances with the
+       @Singleton annotation. This makes sure that only one instance of the injected classes are loaded into the application and recycled
+       when needed. Although singletons can be good when object creation is heavy, they do not fare well in multithreaded environments especially
+       when there is mutually shared data to be mutated. Singletons make unit testing very difficult by introducing a global state therefore,
+       making it difficult to mock objects.
+       However, as mentioned above, Singletons really shine when object creation is heavy and we want to only do so once in out app.
+
+
+    For each pattern, name one thing about the pattern that you LIKED, and one thing you DISLIKED. If you did not like
+    anything, you can name two things you disliked.
+
+
