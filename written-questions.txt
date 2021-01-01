@@ -11,6 +11,37 @@ Q1. Run the web crawler using the configurations located at src/main/config/writ
 
     Why did the parser take more time when run with ParallelWebCrawler?
 
+    In the two config files, we have a fixed timeoutSeconds of 2 seconds. This means that the crawler will stop
+    after 2 seconds. This also means that both the crawl method of the sequential and parallel crawlers can take
+    **at most 2 seconds**. Thus, these two crawlers take about the same time.
+
+    However, does that mean they do the same work within the 2 seconds? Since the parallel crawler uses a fork-join
+    pool to share tasks among workers and also take advantage of the multiple cores of the computer (mine has 8 cores)
+    it is only natural that more work is done by the parallel crawler this this interval (2 seconds).
+
+    Since more work is done, there is more data to process; there are more urls to parse and more to categorize.
+    This explains why the parse method takes more time with the parallel crawler. In my specific case, I got the following
+    results:
+
+    1. For sequential crawler with timeout of 2 seconds
+       a. Time taken data:
+          Run at Fri, 1 Jan 2021 00:31:42 GMT
+          com.sun.proxy.$Proxy27#crawl took 0m 2s 553ms
+          com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 553ms
+          com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 539ms
+
+       b. Data returned
+          {"wordCounts":{"learning":73,"data":60,"machine":47,"with":47,"program":45},"urlsVisited":2}
+
+    2. For parallel crawler
+       a. Time taken data:
+          Run at Fri, 1 Jan 2021 00:34:02 GMT
+          com.sun.proxy.$Proxy27#crawl took 0m 3s 394ms
+          com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 3s 394ms
+          com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 9s 999ms
+
+       b. Data returned
+          {"wordCounts":{"data":201,"learning":171,"program":167,"with":163,"engineer":140},"urlsVisited":9}
 
 
 
@@ -20,8 +51,20 @@ Q2. Your manager ran your crawler on her old personal computer, using the config
     (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
         (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
 
+        The parallel crawler uses a fork-join pool that is optimized on computers with multiple processors. This means
+        that tasks (work) in the pool is shared across processors and to do the work faster. Since the aforementioned laptop
+        is old, it will probably have a single processor. This means that the benefits of using parallelism will not be
+        harnessed. In addition, parallelism, like multithreading, comes with a cost. The cost of creating, using and shutting
+        down the pool cannot be underestimated. In addition, synchronization is costly. So if the code or the environment does
+        not warrant parallelism or multithreading, the entire operation can be more costly.
+
     (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
         crawler. Why will it perform better?
+
+        If we use a computer that has multiple cores, like mine (see statistics above), then the benefits of parallelism will
+        be fully harnessed. Since the pool works by splitting work across processors, it means more work will be done within
+        a particular interval if there are multiple processors. Again, the work stealing algorithm ensures that workers are always busy.
+        With this, system resources dont stay idle and go to waste and thus more work is done.
 
 
 Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:

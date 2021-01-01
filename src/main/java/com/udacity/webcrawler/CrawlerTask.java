@@ -124,13 +124,8 @@ public class CrawlerTask extends RecursiveAction {
         visitedUrls.add(url);
 
         PageParser.Result result = parserFactory.get(url).parse();
-        result.getWordCounts().forEach((key, value) -> {
-            if (wordCounts.containsKey(key)){
-                wordCounts.put(key, value + wordCounts.get(key));
-            } else {
-                wordCounts.put(key, value);
-            }
-        });
+
+        result.getWordCounts().forEach((key, value) -> wordCounts.compute(key, (k, v) -> (v == null) ? value : value + v));
 
         List<CrawlerTask> tasks = getTasks(result.getLinks(), maxDepth-1);
         invokeAll(tasks);
