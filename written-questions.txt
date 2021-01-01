@@ -13,7 +13,7 @@ Q1. Run the web crawler using the configurations located at src/main/config/writ
 
     In the two config files, we have a fixed timeoutSeconds of 2 seconds. This means that the crawler will stop
     after 2 seconds. This also means that both the crawl method of the sequential and parallel crawlers can take
-    **at most 2 seconds**. Thus, these two crawlers take about the same time.
+    at most 2 seconds. Thus, these two crawlers take about the same time.
 
     However, does that mean they do the same work within the 2 seconds? Since the parallel crawler uses a fork-join
     pool to share tasks among workers and also take advantage of the multiple cores of the computer (mine has 8 cores)
@@ -63,8 +63,8 @@ Q2. Your manager ran your crawler on her old personal computer, using the config
 
         If we use a computer that has multiple cores, like mine (see statistics above), then the benefits of parallelism will
         be fully harnessed. Since the pool works by splitting work across processors, it means more work will be done within
-        a particular interval if there are multiple processors. Again, the work stealing algorithm ensures that workers are always busy.
-        With this, system resources dont stay idle and go to waste and thus more work is done.
+        a particular interval if there are multiple processors. Again, the work stealing algorithm implemented by the pool
+        ensures that workers are always busy. With this, system resources dont stay idle and go to waste and thus more work is done.
 
 
 Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:
